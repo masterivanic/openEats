@@ -1,4 +1,4 @@
 
-ingredient/__pycache__/*
-tag/__pycache__/*
-recipe/__pycache__/*
+ingredient/__pycache__/
+tag/__pycache__/
+recipe/__pycache__/
