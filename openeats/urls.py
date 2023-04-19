@@ -21,6 +21,6 @@ urlpatterns = [
     path("", lambda r: redirect("api/swagger-ui/")),
     path("admin/", admin.site.urls),
     path("", include("recipe.urls")),
-    path("api/ingredient", include("ingredient.urls")),
+    path("", include("ingredient.urls")),
     path("api/tag", include("tag.urls")),
 ]

@@ -6,7 +6,9 @@ from .views import IngredientViewSet
 
 router = DefaultRouter()
 
-router.register("", IngredientViewSet)
+app_name = "ingredient"
+
+router.register("api/ingredient", IngredientViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

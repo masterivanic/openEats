@@ -6,6 +6,7 @@ from .views import TagViewSet
 
 router = DefaultRouter()
 
+app_name = "tag"
 router.register("", TagViewSet)
 
 urlpatterns = [

@@ -8,7 +8,7 @@ from .views import UserViewSet
 router = DefaultRouter()
 
 router.register("api/user", UserViewSet)
-router.register("api/recipe", RecipeViewSet)
+router.register("api/recipe", RecipeViewSet, basename="recipe")
 
 
 urlpatterns = [
