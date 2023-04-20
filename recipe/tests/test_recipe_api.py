@@ -11,11 +11,11 @@ from recipe.serializers import UserSerializer
 class UserTestAPI(APITestCase):
     """User api endpoint test"""
 
-    def test_user_listing(self):
+    def test_user_listing(self) -> None:
         response = self.client.get(reverse("user-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_user_creation(self):
+    def test_user_creation(self) -> None:
         user_to_create = dict(
             username="Jean", email="jean@gmail.com", password="ceciestmonpass"
         )
@@ -25,7 +25,7 @@ class UserTestAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(user.username, user_to_create["username"])
 
-    def test_user_update(self):
+    def test_user_update(self) -> None:
         user_update = User.objects.all()[0:1]
         user_update.email = "invente@gmail.com"
         user_serializer = UserSerializer(data=user_update)
@@ -37,11 +37,11 @@ class UserTestAPI(APITestCase):
 class RecipeTestAPI(APITestCase):
     """Recipe api endpoint test"""
 
-    def test_user_listing(self):
+    def test_user_listing(self) -> None:
         response = self.client.get(reverse("recipe-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_recipe_creation(self):
+    def test_recipe_creation(self) -> None:
         recipe_to_create = dict(
             name="test",
             description="test",
@@ -56,7 +56,7 @@ class RecipeTestAPI(APITestCase):
         self.assertEqual(recipe.name, recipe_to_create["name"])
         self.assertEqual(recipe.user, recipe_to_create["user"])
 
-    def test_update_recipe(self):
+    def test_update_recipe(self) -> None:
         recipe = Recipe.objects.all()[0:1]
         recipe.description = "description test"
         recipe_serializer = RecipeSerializer(data=recipe)

@@ -30,3 +30,6 @@ media
 
 # Pytest cache #
 .pytest_cache/*
+recipe/__pycache__/*
+recipe/management/commands/__pycache__/*
+recipe/migration/__pycache__/*

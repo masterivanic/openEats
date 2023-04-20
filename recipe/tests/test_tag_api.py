@@ -7,11 +7,13 @@ from recipe.serializers import TagSerializer
 
 
 class TagTestAPI(APITestCase):
-    def test_listening_tags(self):
+    """Tag api endpoint test"""
+
+    def test_listening_tags(self) -> None:
         response = self.client.get(reverse("tag-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tags_creation(self):
+    def test_tags_creation(self) -> None:
         tag_to_create = dict(name="string", description="string", recipe=0)
 
         response = self.client.post(reverse("tag-list"), tag_to_create)
@@ -19,7 +21,7 @@ class TagTestAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(tag.name, tag_to_create["name"])
 
-    def test_tags_updating(self):
+    def test_tags_updating(self) -> None:
         tag = Tag.objects.all()[0:1]
         tag.name = "name"
         tag_serializer = TagSerializer(data=tag)

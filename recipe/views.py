@@ -50,9 +50,15 @@ class RecipeViewSet(
         detail=False,
         url_path=r"search/(?P<id_ing>[\d-]+)/(?P<id_tag>[\d-]+)",
     )
-    def search(self, request, id_ing, id_tag):
-        """search a recipe by ingredient and tag"""
+    def search(self, request, id_ing: int, id_tag: int) -> Response:
+        """
+        search a recipe by ingredient and tag
 
+        :request: the request object
+        :param id_ing: ingredient id
+        :param id_tag: tags id
+        :return: an Http response
+        """
         ingredients = get_object_or_404(Ingredient, pk=id_ing)
         tags = get_object_or_404(Tag, pk=id_tag)
         if ingredients.recipe.pk == tags.recipe.pk:

@@ -1,7 +1,9 @@
 import csv
 from collections import namedtuple
+from typing import Optional
 
 from django.core.management.base import BaseCommand
+from django.core.management.base import CommandParser
 
 from ...models import Ingredient
 
@@ -9,7 +11,7 @@ from ...models import Ingredient
 class IngredientModel:
     """model use for define our csv file header (structure)"""
 
-    def __init__(self, name, description) -> None:
+    def __init__(self, name: str, description: str) -> None:
         self.name = name
         self.description = description
 
@@ -17,12 +19,12 @@ class IngredientModel:
 class Command(BaseCommand):
     help = "Help us to import ingredient in db"
 
-    def add_arguments(self, parser) -> None:
+    def add_arguments(self, parser: CommandParser) -> None:
         """here we define args for our command"""
 
         parser.add_argument("import_ingredient_file", type=str, nargs="?")
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> Optional[str]:
         try:
             list_ingredient = []
             with open("data/ingredients.csv", "r") as file:
