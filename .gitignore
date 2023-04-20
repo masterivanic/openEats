@@ -1,11 +1,32 @@
 
-ingredient/__pycache__/
-tag/__pycache__/
-recipe/__pycache__/
-
-__pycache__/
+# Static files #
+openeats/__pycache__/*
+recipe/tests/__pycache__/*
 static/admin
 static/django_extensions
 static/rest_framework
 
+# Django default db #
 db.sqlite3
+
+# Django #
+*.log
+*.pot
+*.pyc
+__pycache__
+db.sqlite3
+media
+
+# Backup files #
+*.bak
+
+# Visual Studio Code #
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history
+
+# Pytest cache #
+.pytest_cache/*

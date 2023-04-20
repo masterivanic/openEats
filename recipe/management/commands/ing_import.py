@@ -2,9 +2,8 @@ import csv
 from collections import namedtuple
 
 from django.core.management.base import BaseCommand
-from django.core.management.base import CommandError
 
-from ingredient.models import Ingredient
+from ...models import Ingredient
 
 
 class IngredientModel:

@@ -10,6 +10,7 @@ Django = "^4.2"
 djangorestframework = "^3.14.0"
 django-filter = "^23.1"
 drf-spectacular = "^0.26.2"
+django-extensions = "^3.2.1"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^3.2.2"

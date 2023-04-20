@@ -6,12 +6,14 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from .models import Ingredient
 from .models import Recipe
+from .models import Tag
+from .serializers import IngredientSerializer
 from .serializers import RecipeDetailsSerializer
 from .serializers import RecipeSerializer
+from .serializers import TagSerializer
 from .serializers import UserSerializer
-from ingredient.models import Ingredient
-from tag.models import Tag
 
 
 class UserViewSet(
@@ -39,16 +41,9 @@ class RecipeViewSet(
     serializer_class = RecipeSerializer
 
     def get_serializer_class(self):
-        if self.action == "search" or self.action == "list":
+        if self.action == "search":
             return RecipeDetailsSerializer
         return self.serializer_class
-
-    def list(self, request):
-        """override list method to apply new serializer"""
-
-        queryset = Recipe.objects.all()
-        serializer = RecipeDetailsSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(
         methods=["GET"],
@@ -66,3 +61,23 @@ class RecipeViewSet(
             if serializer.is_valid():
                 return Response(data=serializer.data, status=status.HTTP_200_OK)
         return Response({"detail": "not exist"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class IngredientViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = IngredientSerializer
+    queryset = Ingredient.objects.all()
+
+
+class TagViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    serializer_class = TagSerializer
+    queryset = Tag.objects.all()

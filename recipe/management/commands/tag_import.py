@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from django.core.management.base import BaseCommand
 
-from tag.models import Tag
+from ...models import Tag
 
 
 class TagModel:

@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
+from .models import Ingredient
 from .models import Recipe
-from ingredient.serializers import IngredientSerializer
-from tag.serializers import TagSerializer
+from .models import Tag
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -20,6 +20,20 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
+        fields = "__all__"
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ingredient
+        fields = "__all__"
+
+
+class TagSerializer(serializers.ModelSerializer):
+    """tag seriliazer in json"""
+
+    class Meta:
+        model = Tag
         fields = "__all__"
 
 

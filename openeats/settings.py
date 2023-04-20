@@ -38,8 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "drf_spectacular",
-    "ingredient",
-    "tag",
+    "django_extensions",
     "recipe",
 ]
 
