@@ -42,12 +42,8 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
     )
-    ingredient = models.ManyToManyField(
-        Ingredient, verbose_name="the related ingredient", null=True
-    )
-    tag = models.ManyToManyField(
-        Tag, verbose_name="the related tag", null=True, blank=True
-    )
+    ingredient = models.ManyToManyField(Ingredient)
+    tag = models.ManyToManyField(Tag, blank=True)
 
     class Meta:
         ordering = ["name"]
@@ -55,4 +51,7 @@ class Recipe(models.Model):
         verbose_name = "Recipe"
 
     def __str__(self):
-        return self.name
+        return "%s (%s)" % (
+            self.name,
+            ", ".join(ingredient.name for ingredient in self.ingredient.all()),
+        )
