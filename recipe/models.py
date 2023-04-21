@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from openeats.main_models import MainModel
-
 
 class Recipe(models.Model):
     """This class define a user recette to cook"""
@@ -25,25 +23,30 @@ class Recipe(models.Model):
         return self.name
 
 
-class Tag(MainModel):
+class Tag(models.Model):
     """This class define a tag of a recette"""
 
+    name = models.CharField(max_length=120, null=False, blank=True)
+    description = models.CharField(max_length=120, null=False, blank=True)
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, verbose_name="the related recipe", null=True
+        Recipe, on_delete=models.SET_NULL, verbose_name="the related recipe", null=True
     )
 
-    class Meta(MainModel.Meta):
+    class Meta:
         db_table_comment = "Tag table"
         verbose_name = "Tag"
+        ordering = ["name"]
 
 
-class Ingredient(MainModel):
+class Ingredient(models.Model):
     """This class define a ingredient of a recette"""
 
-    recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, verbose_name="the related recipe", null=True
+    name = models.CharField(max_length=120, null=False, blank=True)
+    description = models.CharField(max_length=120, null=False, blank=True)
+    recipe = models.ManyToManyField(
+        Recipe, verbose_name="the related recipe", null=True
     )
 
-    class Meta(MainModel.Meta):
+    class Meta:
         db_table_comment = "Ingredient table"
         verbose_name = "Ingredient"

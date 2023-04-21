@@ -9,6 +9,8 @@ static/rest_framework
 # Django default db #
 db.sqlite3
 
+data/*
+
 # Django #
 *.log
 *.pot
