@@ -2,6 +2,35 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Ingredient(models.Model):
+    """This class define a ingredient of a recette"""
+
+    name = models.CharField(max_length=120, null=False, blank=True)
+    description = models.CharField(max_length=120, null=False, blank=True)
+
+    class Meta:
+        db_table_comment = "Ingredient table"
+        verbose_name = "Ingredient"
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(models.Model):
+    """This class define a tag of a recette"""
+
+    name = models.CharField(max_length=120, null=False, blank=True)
+    description = models.CharField(max_length=120, null=False, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table_comment = "Tag table"
+        verbose_name = "Tag"
+        ordering = ["name"]
+
+
 class Recipe(models.Model):
     """This class define a user recette to cook"""
 
@@ -13,6 +42,12 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
     )
+    ingredient = models.ManyToManyField(
+        Ingredient, verbose_name="the related ingredient", null=True
+    )
+    tag = models.ManyToManyField(
+        Tag, verbose_name="the related tag", null=True, blank=True
+    )
 
     class Meta:
         ordering = ["name"]
@@ -21,32 +56,3 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Tag(models.Model):
-    """This class define a tag of a recette"""
-
-    name = models.CharField(max_length=120, null=False, blank=True)
-    description = models.CharField(max_length=120, null=False, blank=True)
-    recipe = models.ForeignKey(
-        Recipe, on_delete=models.SET_NULL, verbose_name="the related recipe", null=True
-    )
-
-    class Meta:
-        db_table_comment = "Tag table"
-        verbose_name = "Tag"
-        ordering = ["name"]
-
-
-class Ingredient(models.Model):
-    """This class define a ingredient of a recette"""
-
-    name = models.CharField(max_length=120, null=False, blank=True)
-    description = models.CharField(max_length=120, null=False, blank=True)
-    recipe = models.ManyToManyField(
-        Recipe, verbose_name="the related recipe", null=True
-    )
-
-    class Meta:
-        db_table_comment = "Ingredient table"
-        verbose_name = "Ingredient"

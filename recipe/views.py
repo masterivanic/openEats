@@ -4,6 +4,7 @@ from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from .models import Ingredient
@@ -39,6 +40,7 @@ class RecipeViewSet(
 
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    permission_classes = [AllowAny]
 
     def get_serializer_class(self):
         if self.action == "search":
