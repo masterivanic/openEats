@@ -40,17 +40,34 @@ class TagSerializer(serializers.ModelSerializer):
 class RecipeDetailsSerializer(serializers.ModelSerializer):
     """RecipeDetails seriliazer in json"""
 
-    ingredients = IngredientSerializer(many=True, read_only=True)
-    tags = TagSerializer(many=True, read_only=True)
+    ingredient = IngredientSerializer(many=True)
+    tag = TagSerializer(many=True)
 
     class Meta:
         model = Recipe
-        fields = (
+        fields = [
             "name",
             "description",
             "preparation_time",
             "cuisson_time",
             "user",
-            "ingredients",
-            "tags",
-        )
+            "ingredient",
+            "tag",
+        ]
+
+    def create(self, validated_data):
+        """
+        :param validated_data: get dict data from key of our instance
+        return complete object instances based on the validated data
+        """
+
+        ingredients_data = validated_data.pop("ingredient")
+        tag_data = validated_data.pop("tag")
+
+        recipe = Recipe.objects.create(**validated_data)
+        ingredients = [Ingredient(recipe, **data) for data in ingredients_data]
+        tags = [Tag(recipe, **data) for data in tag_data]
+        Ingredient.objects.bulk_create(ingredients)
+        Tag.objects.bulk_create(tags)
+
+        return recipe
