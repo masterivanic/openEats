@@ -95,7 +95,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         elif name:
             result = Recipe.objects.filter(name=name)
 
-        queryset = self.filter_queryset(result)
+        queryset = self.filter_queryset(result.prefetch_related("ingredient", "tag"))
         page = self.paginate_queryset(queryset)
         if page:
             serializer = self.get_serializer(page, many=True)
