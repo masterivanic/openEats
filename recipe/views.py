@@ -79,6 +79,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         :param recipe_name: recipe name
         :return: an Http response
         """
+
         query_params = self.request.query_params.dict()
         serializer_search = SearchSerializer(data=query_params)
         serializer_search.is_valid(raise_exception=True)
@@ -88,34 +89,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
         name = serializer_search.validated_data.get("name")
 
         if ingredient_name:
-            queryset = Recipe.objects.prefetch_related(Prefetch("ingredient"))
-            list_recette = [
-                (recette, recette.ingredient.filter(name=ingredient_name))
-                for recette in queryset
-            ]
-            queryset = [recette[0] for recette in list_recette]
+            result = Recipe.objects.filter(ingredient__name=ingredient_name)
         elif tag_name:
-            queryset = Recipe.objects.prefetch_related(Prefetch("tag"))
-            list_tags = [
-                (recette, recette.tag.filter(name=tag_name)) for recette in queryset
-            ]
-            queryset = [recette[0] for recette in list_tags]
-
+            result = Recipe.objects.filter(tag__name=tag_name)
         elif name:
-            queryset = Recipe.objects.filter(name=name)
+            result = Recipe.objects.filter(name=name)
 
-        queryset = list(
-            map(
-                lambda obj: RecipeSerializer(obj).data
-                if RecipeSerializer(obj).is_valid()
-                else dict(),
-                queryset,
-            )
-        )
+        queryset = self.filter_queryset(result)
         page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(data=page, many=True)
-        serializer.is_valid(raise_exception=True)
-        return Response(data=serializer.data, status=status.HTTP_404_NOT_FOUND)
+        if page:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
