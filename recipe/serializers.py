@@ -37,6 +37,12 @@ class TagSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SearchSerializer(serializers.Serializer):
+    ingredient_name = serializers.CharField(max_length=200, required=False)
+    tag_name = serializers.CharField(max_length=200, required=False)
+    name = serializers.CharField(max_length=200, required=False)
+
+
 class RecipeDetailsSerializer(serializers.ModelSerializer):
     """RecipeDetails seriliazer in json"""
 
@@ -55,7 +61,7 @@ class RecipeDetailsSerializer(serializers.ModelSerializer):
             "tag",
         ]
 
-    def create(self, validated_data):
+    def create(self, validated_data) -> Recipe:
         """
         :param validated_data: get dict data from key of our instance
         return complete object instances based on the validated data

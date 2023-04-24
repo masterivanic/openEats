@@ -1,18 +1,26 @@
+import django_filters.rest_framework
 from django.contrib.auth.models import User
 from django.db.models import Prefetch
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema_view
+from drf_spectacular.utils import OpenApiParameter
+from rest_framework import filters
 from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from .filters import RecipeFilter
 from .models import Ingredient
 from .models import Recipe
 from .models import Tag
 from .serializers import IngredientSerializer
 from .serializers import RecipeDetailsSerializer
 from .serializers import RecipeSerializer
+from .serializers import SearchSerializer
 from .serializers import TagSerializer
 from .serializers import UserSerializer
 
@@ -29,30 +37,38 @@ class UserViewSet(
     queryset = User.objects.all()
 
 
+@extend_schema_view(
+    search=extend_schema(
+        description="API endpoint to search a recipe \n\n",
+        parameters=[SearchSerializer],
+    ),
+)
 class RecipeViewSet(viewsets.ModelViewSet):
 
     """define recipe api endpoint"""
 
     queryset = Recipe.objects.prefetch_related(Prefetch("ingredient"), Prefetch("tag"))
     serializer_class = RecipeSerializer
+    filterset_class = RecipeFilter
+    filter_backends = [filters.SearchFilter]
     permission_classes = [AllowAny]
 
     def get_serializer_class(self):
-        if self.action in ("list", "search", "retrieve"):
+        if self.action in ("list", "retrieve"):
             return RecipeDetailsSerializer
         return self.serializer_class
+
+    def get_filterset_class(self):
+        pass
 
     @action(
         methods=["GET"],
         detail=False,
-        url_path=r"search/(?P<ingredient_name>\w+)/(?P<tag_name>\w+)/(?P<recipe_name>\w+)",
+        url_path=r"search",
     )
     def search(
         self,
         request,
-        ingredient_name: str = None,
-        tag_name: str = None,
-        recipe_name: str = None,
     ) -> Response:
         """
         search a recipe by ingredient and tag
@@ -63,6 +79,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         :param recipe_name: recipe name
         :return: an Http response
         """
+        query_params = self.request.query_params.dict()
+        serializer_search = SearchSerializer(data=query_params)
+        serializer_search.is_valid(raise_exception=True)
+
+        ingredient_name = serializer_search.validated_data.get("ingredient_name")
+        tag_name = serializer_search.validated_data.get("tag_name")
+        name = serializer_search.validated_data.get("name")
 
         if ingredient_name:
             queryset = Recipe.objects.prefetch_related(Prefetch("ingredient"))
@@ -78,13 +101,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
             ]
             queryset = [recette[0] for recette in list_tags]
 
-        elif recipe_name:
-            queryset = Recipe.objects.filter(name=recipe_name)
+        elif name:
+            queryset = Recipe.objects.filter(name=name)
 
-            serializer = self.get_serializer(data=queryset)
-            if serializer.is_valid():
-                return Response(data=serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        queryset = list(
+            map(
+                lambda obj: RecipeSerializer(obj).data
+                if RecipeSerializer(obj).is_valid()
+                else dict(),
+                queryset,
+            )
+        )
+        page = self.paginate_queryset(queryset)
+        serializer = self.get_serializer(data=page, many=True)
+        serializer.is_valid(raise_exception=True)
+        return Response(data=serializer.data, status=status.HTTP_404_NOT_FOUND)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
