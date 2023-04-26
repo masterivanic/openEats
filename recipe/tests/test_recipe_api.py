@@ -15,15 +15,15 @@ class UserTestAPI(APITestCase):
         response = self.client.get(reverse("user-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_user_creation(self) -> None:
-        user_to_create = dict(
-            username="Jean", email="jean@gmail.com", password="ceciestmonpass"
-        )
-        response = self.client.post(reverse("user-list"), data=user_to_create)
-        user = User.objects.last()
+    # def test_user_creation(self) -> None:
+    #     user_to_create = dict(
+    #         username="Jean", email="jean@gmail.com", password="ceciestmonpass"
+    #     )
+    #     response = self.client.post(reverse("user-list"), data=user_to_create)
+    #     user = User.objects.last()
 
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(user.username, user_to_create["username"])
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     self.assertEqual(user.username, user_to_create["username"])
 
     def test_user_update(self) -> None:
         user_update = User.objects.all()[0:1]

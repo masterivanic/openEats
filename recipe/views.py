@@ -105,8 +105,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-        except:
-            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as error:
+            return Response({"error": error}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
