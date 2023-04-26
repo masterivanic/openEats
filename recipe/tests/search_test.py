@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.urls import reverse
+from django_query_capture.test_utils import AssertInefficientQuery
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -14,13 +15,15 @@ class SearchTestAPI(APITestCase):
         params = {"name": "su"}
         recipe = Recipe.objects.filter(name__icontains=params["name"])
         serializer = RecipeDetailsSerializer(recipe, many=True)
-        factory = self.client.get(reverse("recipe-search"), {"name": "Sushi"})
-        factory1 = self.client.get(reverse("recipe-search"), params)
 
-        assert factory.status_code == status.HTTP_200_OK
-        assert factory1.status_code == status.HTTP_200_OK
-        self.assertEqual(factory.data, serializer.data)
-        self.assertEqual(factory1.data, serializer.data)
+        with AssertInefficientQuery(num=19):
+            factory = self.client.get(reverse("recipe-search"), {"name": "Sushi"})
+            factory1 = self.client.get(reverse("recipe-search"), params)
+
+            assert factory.status_code == status.HTTP_200_OK
+            assert factory1.status_code == status.HTTP_200_OK
+            self.assertEqual(factory.data, serializer.data)
+            self.assertEqual(factory1.data, serializer.data)
 
     def test_that_user_can_filter_recipe_using_ingredient(self) -> None:
         params = {"ingredient_name": "farine"} or {"ingredient_name": "Fa"}

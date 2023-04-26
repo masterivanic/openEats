@@ -15,15 +15,15 @@ class UserTestAPI(APITestCase):
         response = self.client.get(reverse("user-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    # def test_user_creation(self) -> None:
-    #     user_to_create = dict(
-    #         username="Jean", email="jean@gmail.com", password="ceciestmonpass"
-    #     )
-    #     response = self.client.post(reverse("user-list"), data=user_to_create)
-    #     user = User.objects.last()
+    def test_user_creation(self) -> None:
+        user_to_create = dict(
+            username="Jean", email="jean@gmail.com", password="ceciestmonpass"
+        )
+        response = self.client.post(reverse("user-list"), data=user_to_create)
+        user = User.objects.last()
 
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     self.assertEqual(user.username, user_to_create["username"])
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(user.username, user_to_create["username"])
 
     def test_user_update(self) -> None:
         user_update = User.objects.all()[0:1]
@@ -42,19 +42,22 @@ class RecipeTestAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_recipe_creation(self) -> None:
-        recipe_to_create = dict(
+        recipe_to_create = Recipe(
             name="test",
             description="test",
             preparation_time="2023-04-19T10:51:01.889Z",
             cuisson_time="2023-04-19T10:51:01.889Z",
-            user=1,
+            user=UserSerializer(User.objects.get(pk=1)).data,
         )
-        response = self.client.post(reverse("recipe-list"), recipe_to_create)
+
+        response = self.client.post(
+            reverse("recipe-list"), RecipeSerializer(recipe_to_create).data
+        )
         recipe = Recipe.objects.filter(name="test", description="test")[0:1]
 
+        serializer = RecipeSerializer(recipe)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(recipe.name, recipe_to_create["name"])
-        self.assertEqual(recipe.user, recipe_to_create["user"])
+        self.assertEqual(serializer.data, RecipeSerializer(recipe_to_create).data)
 
     def test_update_recipe(self) -> None:
         recipe = Recipe.objects.all()[0:1]

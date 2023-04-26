@@ -51,6 +51,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_query_capture.middleware.QueryCaptureMiddleware",
 ]
 
 ROOT_URLCONF = "openeats.urls"

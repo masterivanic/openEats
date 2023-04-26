@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.versioning import URLPathVersioning
 
 from .filters import RecipeFilter
 from .models import Ingredient
@@ -53,6 +54,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = [filters.SearchFilter]
     permission_classes = [AllowAny]
+    # versioning_class = URLPathVersioning
 
     def get_serializer_class(self):
         if self.action in ("list", "retrieve"):
