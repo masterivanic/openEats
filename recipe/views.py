@@ -86,22 +86,27 @@ class RecipeViewSet(viewsets.ModelViewSet):
         tag_name = serializer_search.validated_data.get("tag_name")
         name = serializer_search.validated_data.get("name")
 
-        if all([ingredient_name, tag_name, name]):
-            # here we make query too according to case sensitive
-            queryset = Recipe.objects.filter(
-                Q(ingredient__name__iexact=ingredient_name),
-                Q(tag__name__iexact=tag_name),
-                Q(name__iexact=name),
-            )
+        values = [ingredient_name, tag_name, name]
+        param_values = list(
+            map(lambda value: value if value is not None else "", values)
+        )
 
+        # here we make query too according to case sensitive
+        queryset = Recipe.objects.filter(
+            Q(ingredient__name__icontains=param_values[0]),
+            Q(tag__name__icontains=param_values[1]),
+            Q(name__icontains=param_values[2]),
+        )
+
+        try:
             page = self.paginate_queryset(queryset)
             if page:
                 serializer = self.get_serializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
-        else:
-            return Response(status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

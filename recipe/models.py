@@ -46,7 +46,6 @@ class Recipe(models.Model):
     )
     ingredient = models.ManyToManyField(Ingredient)
     tag = models.ManyToManyField(Tag, blank=True)
-    # objects = RecipeManager()
 
     class Meta:
         ordering = ["name"]
