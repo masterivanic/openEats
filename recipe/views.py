@@ -100,15 +100,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
             Q(name__icontains=param_values[2]),
         )
 
-        try:
-            page = self.paginate_queryset(queryset)
-            if page:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-        except Exception as error:
-            return Response({"error": error}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        page = self.paginate_queryset(queryset)
+        if page:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+   
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
