@@ -13,7 +13,8 @@ from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.versioning import URLPathVersioning
+from rest_framework.request import Request
+
 
 from .filters import RecipeFilter
 from .models import Ingredient
@@ -54,13 +55,12 @@ class RecipeViewSet(viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = [filters.SearchFilter]
     permission_classes = [AllowAny]
-    # versioning_class = URLPathVersioning
 
     def get_serializer_class(self):
-        if self.action in ("list", "retrieve"):
+        if self.action in ("list", "retrieve","search"):
             return RecipeDetailsSerializer
         return self.serializer_class
-
+    
     @action(
         methods=["GET"],
         detail=False,
@@ -79,33 +79,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
         :param recipe_name: recipe name
         :return: an Http response
         """
-
+        params = ["ingredient_name", "tag_name", "name"]
         query_params = self.request.query_params.dict()
-        serializer_search = SearchSerializer(data=query_params)
-        serializer_search.is_valid(raise_exception=True)
 
-        ingredient_name = serializer_search.validated_data.get("ingredient_name")
-        tag_name = serializer_search.validated_data.get("tag_name")
-        name = serializer_search.validated_data.get("name")
-
-        values = [ingredient_name, tag_name, name]
-        param_values = list(
-            map(lambda value: value if value is not None else "", values)
+        keys_is_present = list(
+            map(lambda value: True if value in params else False, list(query_params.keys()))
         )
 
-        # here we make query too according to case sensitive
-        queryset = Recipe.objects.filter(
-            Q(ingredient__name__icontains=param_values[0]),
-            Q(tag__name__icontains=param_values[1]),
-            Q(name__icontains=param_values[2]),
-        )
+        if all(keys_is_present): 
+            serializer_search = SearchSerializer(data=query_params)
+            serializer_search.is_valid(raise_exception=True)
 
-        page = self.paginate_queryset(queryset)
-        if page:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+            ingredient_name = serializer_search.validated_data.get("ingredient_name")
+            tag_name = serializer_search.validated_data.get("tag_name")
+            name = serializer_search.validated_data.get("name")
+
+            values = [ingredient_name, tag_name, name]
+            param_values = list(
+                map(lambda value: value if value is not None else "", values)
+            )
+
+            # here we make query too according to case sensitive
+            queryset = Recipe.objects.filter(
+                Q(ingredient__name__icontains=param_values[0]),
+                Q(tag__name__icontains=param_values[1]),
+                Q(name__icontains=param_values[2]),
+            )
+            page = self.paginate_queryset(queryset)
+            if page:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        else:
+            return Response({"error": "invalid params"}, status=status.HTTP_404_NOT_FOUND)
    
 
 

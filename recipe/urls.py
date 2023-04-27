@@ -10,10 +10,10 @@ from .views import UserViewSet
 
 router = DefaultRouter()
 
-router.register("api/v1/user", UserViewSet)
-router.register("api/v1/recipe", RecipeViewSet, basename="recipe")
-router.register("api/v1/ingredient", IngredientViewSet, basename="ingredient")
-router.register("api/v1/tag", TagViewSet, basename="tag")
+router.register("api/user", UserViewSet)
+router.register("api/recipe", RecipeViewSet, basename="recipe")
+router.register("api/ingredient", IngredientViewSet, basename="ingredient")
+router.register("api/tag", TagViewSet, basename="tag")
 
 
 urlpatterns = [

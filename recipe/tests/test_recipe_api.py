@@ -47,7 +47,7 @@ class RecipeTestAPI(APITestCase):
             description="test",
             preparation_time="2023-04-19T10:51:01.889Z",
             cuisson_time="2023-04-19T10:51:01.889Z",
-            user=UserSerializer(User.objects.get(pk=1)).data,
+            user=UserSerializer(User(pk=1)).data
         )
 
         response = self.client.post(

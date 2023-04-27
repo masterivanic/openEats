@@ -70,3 +70,22 @@ class SearchTestAPI(APITestCase):
 
         assert response.status_code == status.HTTP_200_OK
         self.assertEqual(response.data, serializer.data)
+
+    def test_that_search_dont_return_items_that_where_not_asked_through_filtering(self) -> None:
+        params = {"tag_name": "Halal"}
+        recipe_expected = Recipe.objects.filter(
+           tag__name__icontains=params["tag_name"]
+        )
+        recipe_dont_expected = Recipe.objects.filter(
+           tag__name__icontains=""
+        )
+
+        serializer = RecipeDetailsSerializer(recipe_expected, many=True)
+
+        response = self.client.get(reverse("recipe-search"), params)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, serializer.data)
+        assert RecipeDetailsSerializer(recipe_dont_expected, many=True).data ==  serializer.data
+
+        

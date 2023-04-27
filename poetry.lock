@@ -187,6 +187,22 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "django-debug-toolbar"
+version = "4.0.0"
+description = "A configurable set of panels that display various debug information about the current request/response."
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "django_debug_toolbar-4.0.0-py3-none-any.whl", hash = "sha256:bad339d68520652ddc1580c76f136fcbc3e020fd5ed96510a89a02ec81bb3fb1"},
+    {file = "django_debug_toolbar-4.0.0.tar.gz", hash = "sha256:89619f6e0ea1057dca47bfc429ed99b237ef70074dabc065a7faa5f00e1459cf"},
+]
+
+[package.dependencies]
+django = ">=3.2.4"
+sqlparse = ">=0.2"
+
+[[package]]
 name = "django-extensions"
 version = "3.2.1"
 description = "Extensions for Django"
@@ -791,4 +807,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "24e3857d2e6cf0f33c1a36b6991b40e9694c9cf376c8e59151cf9217d401c231"
+content-hash = "9bb94b96cf6a3e105c308d982a9e20f9bd8970bf951ad6425bab8511e19e0b10"
