@@ -26,7 +26,7 @@ class SearchTestAPI(APITestCase):
             self.assertEqual(factory1.data, serializer.data)
 
     def test_that_user_can_filter_recipe_using_ingredient(self) -> None:
-        params = {"ingredient_name": "farine"} or {"ingredient_name": "Fa"}
+        params = {"ingredient_name": "farine"}
         recipe = Recipe.objects.filter(
             ingredient__name__icontains=params["ingredient_name"]
         )
@@ -38,7 +38,7 @@ class SearchTestAPI(APITestCase):
         self.assertEqual(len(response.data), len(serializer.data))
 
     def test_that_user_can_filter_recipe_using_tag(self) -> None:
-        params = {"tag_name": "Halal"} or {"tag_name": "ha"}
+        params = {"tag_name": "Halal"}
         recipe = Recipe.objects.filter(tag__name__icontains=params["tag_name"])
         serializer = RecipeDetailsSerializer(recipe, many=True)
 
