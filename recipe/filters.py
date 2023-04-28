@@ -18,22 +18,3 @@ class RecipeFilter(filters.FilterSet):
     class Meta:
         model = Recipe
         fields = ["name", "ingredient_name", "tag_name"]
-        #     "name": ['exact'],
-        #     "ingredient_name": ['exact'],
-        #     "tag_name":['contains'],
-        # }
-
-        # filter_overrides = {
-        #     models.CharField: {
-        #         'filter_class': django_filters.CharFilter,
-        #         'extra': lambda f: {
-        #             'lookup_expr': 'icontains',
-        #         },
-        #     },
-        # }
-
-        # @property
-        # def qs(self):
-        #     parent = super().qs
-        #     ingredient = Ingredient.objects.filter(pk__lte=100).get()
-        #     return parent.filter(ingredient__pk=ingredient.pk)
