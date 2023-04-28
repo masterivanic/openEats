@@ -15,7 +15,6 @@ class TagTestAPI(APITestCase):
 
     def test_tags_creation(self) -> None:
         tag_to_create = dict(name="string", description="string", recipe=0)
-
         response = self.client.post(reverse("tag-list"), tag_to_create)
         tag = Tag.objects.last()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -23,8 +22,8 @@ class TagTestAPI(APITestCase):
 
     def test_tags_updating(self) -> None:
         tag = Tag.objects.all()[0:1]
-        tag.name = "name"
-        tag_serializer = TagSerializer(data=tag)
+        tag[0].name = "name"
+        tag_serializer = TagSerializer(tag[0])
         if tag_serializer.is_valid():
-            response = self.client.put(reverse("tag-list"), data=tag_serializer.data)
+            response = self.client.put(reverse("tag-list", args=[tag[0].pk]), data=tag_serializer.data)
             self.assertEqual(response.status_code, status.HTTP_200_OK)

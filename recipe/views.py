@@ -99,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 map(lambda value: value if value is not None else "", values)
             )
 
-            # here we make query too according to case sensitive
+            # here we make query according to case sensitive
             queryset = Recipe.objects.filter(
                 Q(ingredient__name__icontains=param_values[0]),
                 Q(tag__name__icontains=param_values[1]),

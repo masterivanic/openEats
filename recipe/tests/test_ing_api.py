@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+from django.shortcuts import get_object_or_404
 
 from recipe.models import Ingredient
 from recipe.serializers import IngredientSerializer
@@ -23,11 +24,13 @@ class IngredientTestAPI(APITestCase):
         assert ingredient.name == ingredient_to_create["name"]
 
     def test_ingredient_update(self) -> None:
-        ingredient = Ingredient.objects.all()[0:1]
-        ingredient.description = "description test"
-        ingredient_serializer = IngredientSerializer(data=ingredient)
-        if ingredient_serializer.is_valid():
-            response = self.client.put(
-                reverse("ingredient-list"), ingredient_serializer.data
-            )
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        ingredient_data = {
+            "name": "test update",
+            "description": "description test"
+        }
+
+        response = self.client.put(
+            reverse("ingredient-detail",  args=[1]),    
+            ingredient_data
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

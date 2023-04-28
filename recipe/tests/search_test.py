@@ -77,15 +77,16 @@ class SearchTestAPI(APITestCase):
            tag__name__icontains=params["tag_name"]
         )
         recipe_dont_expected = Recipe.objects.filter(
-           tag__name__icontains=""
+           tag__name__icontains="vegan"
         )
 
         serializer = RecipeDetailsSerializer(recipe_expected, many=True)
+        serializer_recipe = RecipeDetailsSerializer(recipe_dont_expected, many=True)
 
         response = self.client.get(reverse("recipe-search"), params)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
-        assert RecipeDetailsSerializer(recipe_dont_expected, many=True).data ==  serializer.data
+        self.assertNotEqual(serializer_recipe.data, serializer.data)
 
         
