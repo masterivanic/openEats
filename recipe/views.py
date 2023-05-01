@@ -12,9 +12,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
-from rest_framework.response import Response
 from rest_framework.request import Request
-
+from rest_framework.response import Response
 
 from .filters import RecipeFilter
 from .models import Ingredient
@@ -57,10 +56,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
 
     def get_serializer_class(self):
-        if self.action in ("list", "retrieve","search"):
+        if self.action in ("list", "retrieve", "search"):
             return RecipeDetailsSerializer
         return self.serializer_class
-    
+
     @action(
         methods=["GET"],
         detail=False,
@@ -83,10 +82,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         query_params = self.request.query_params.dict()
 
         keys_is_present = list(
-            map(lambda value: True if value in params else False, list(query_params.keys()))
+            map(
+                lambda value: True if value in params else False,
+                list(query_params.keys()),
+            )
         )
 
-        if all(keys_is_present): 
+        if all(keys_is_present):
             serializer_search = SearchSerializer(data=query_params)
             serializer_search.is_valid(raise_exception=True)
 
@@ -112,8 +114,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         else:
-            return Response({"error": "invalid params"}, status=status.HTTP_404_NOT_FOUND)
-   
+            return Response(
+                {"error": "invalid params"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -130,3 +133,17 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     permission_classes = [AllowAny]
+
+
+"""
+possibilité:
+        nom
+        tag_name
+        ingredient_name
+
+        nom, tag_name
+        nom, ingredient_name
+
+        tag_name, ingredient_name
+
+"""

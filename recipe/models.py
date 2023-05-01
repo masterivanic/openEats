@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from .managers import RecipeManager
-
 
 class Ingredient(models.Model):
     """This class define a ingredient of a recette"""

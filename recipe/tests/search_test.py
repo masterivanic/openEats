@@ -8,6 +8,10 @@ from recipe.models import Recipe
 from recipe.serializers import RecipeDetailsSerializer
 
 
+def create_recipe(db) -> None:
+    pass
+
+
 class SearchTestAPI(APITestCase):
     """search api endpoint testing (to do before wrinting our views)"""
 
@@ -71,14 +75,12 @@ class SearchTestAPI(APITestCase):
         assert response.status_code == status.HTTP_200_OK
         self.assertEqual(response.data, serializer.data)
 
-    def test_that_search_dont_return_items_that_where_not_asked_through_filtering(self) -> None:
+    def test_that_search_dont_return_items_that_where_not_asked_through_filtering(
+        self,
+    ) -> None:
         params = {"tag_name": "Halal"}
-        recipe_expected = Recipe.objects.filter(
-           tag__name__icontains=params["tag_name"]
-        )
-        recipe_dont_expected = Recipe.objects.filter(
-           tag__name__icontains="vegan"
-        )
+        recipe_expected = Recipe.objects.filter(tag__name__icontains=params["tag_name"])
+        recipe_dont_expected = Recipe.objects.filter(tag__name__icontains="vegan")
 
         serializer = RecipeDetailsSerializer(recipe_expected, many=True)
         serializer_recipe = RecipeDetailsSerializer(recipe_dont_expected, many=True)
@@ -88,5 +90,3 @@ class SearchTestAPI(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, serializer.data)
         self.assertNotEqual(serializer_recipe.data, serializer.data)
-
-        

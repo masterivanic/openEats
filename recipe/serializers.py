@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "email", "password"]
-        extra_kwargs = {"password": {"write_only": True}}
+        # extra_kwargs = {"password": {"write_only": True}}
 
 
 class RecipeSerializer(serializers.ModelSerializer):

@@ -1,29 +1,47 @@
+from typing import List
+
+import pytest
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 
 from recipe.models import Tag
 from recipe.serializers import TagSerializer
 
 
-class TagTestAPI(APITestCase):
-    """Tag api endpoint test"""
+@pytest.fixture
+def create_tag(db) -> Tag:
+    return Tag.objects.create(name="Recette italienne", description="trop bon")
 
-    def test_listening_tags(self) -> None:
-        response = self.client.get(reverse("tag-list"))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-    def test_tags_creation(self) -> None:
-        tag_to_create = dict(name="string", description="string", recipe=0)
-        response = self.client.post(reverse("tag-list"), tag_to_create)
-        tag = Tag.objects.last()
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(tag.name, tag_to_create["name"])
+@pytest.fixture
+def create_tag_list(db) -> List[Tag]:
+    tag_list: List[Tag] = []
+    tag_list.append(Tag.objects.create(name="tag1", description=""))
+    tag_list.append(Tag.objects.create(name="tag2", description=""))
+    tag_list.append(Tag.objects.create(name="tag3", description=""))
+    return tag_list
 
-    def test_tags_updating(self) -> None:
-        tag = Tag.objects.all()[0:1]
-        tag[0].name = "name"
-        tag_serializer = TagSerializer(tag[0])
-        if tag_serializer.is_valid():
-            response = self.client.put(reverse("tag-list", args=[tag[0].pk]), data=tag_serializer.data)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+def test_listening_tags(create_tag_list) -> None:
+    response = APIClient().get(reverse("tag-list"))
+    assert response.status_code == status.HTTP_200_OK
+    assert len(create_tag_list) == 3
+
+
+def test_tags_creation(create_tag) -> None:
+    tag_to_create = dict(name="tag4", description="")
+    serializer = TagSerializer(tag_to_create)
+    response = APIClient().post(reverse("tag-list"), serializer.data)
+    assert response.status_code == status.HTTP_201_CREATED
+
+
+def test_tags_update(create_tag) -> None:
+    create_tag.name = "Recette cubaine"
+    create_tag.save()
+    tag_id = create_tag.pk
+    serializer = TagSerializer(create_tag)
+    response = APIClient().put(reverse("tag-detail", args=[tag_id]), serializer.data)
+    tag_from_db = Tag.objects.get(name="Recette cubaine")
+    assert response.status_code == status.HTTP_200_OK
+    assert tag_from_db.name == "Recette cubaine"
