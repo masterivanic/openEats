@@ -2,6 +2,7 @@ import django_filters.rest_framework
 from django.contrib.auth.models import User
 from django.db.models import Prefetch
 from django.db.models import Q
+from django.db.models import When
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
 from drf_spectacular.utils import OpenApiParameter
@@ -78,45 +79,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         :param recipe_name: recipe name
         :return: an Http response
         """
-        params = ["ingredient_name", "tag_name", "name"]
-        query_params = self.request.query_params.dict()
-
-        keys_is_present = list(
-            map(
-                lambda value: True if value in params else False,
-                list(query_params.keys()),
-            )
-        )
-
-        if all(keys_is_present):
-            serializer_search = SearchSerializer(data=query_params)
-            serializer_search.is_valid(raise_exception=True)
-
-            ingredient_name = serializer_search.validated_data.get("ingredient_name")
-            tag_name = serializer_search.validated_data.get("tag_name")
-            name = serializer_search.validated_data.get("name")
-
-            values = [ingredient_name, tag_name, name]
-            param_values = list(
-                map(lambda value: value if value is not None else "", values)
-            )
-
-            # here we make query according to case sensitive
-            queryset = Recipe.objects.filter(
-                Q(ingredient__name__icontains=param_values[0]),
-                Q(tag__name__icontains=param_values[1]),
-                Q(name__icontains=param_values[2]),
-            )
-            page = self.paginate_queryset(queryset)
-            if page:
-                serializer = self.get_serializer(page, many=True)
-                return self.get_paginated_response(serializer.data)
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-        else:
-            return Response(
-                {"error": "invalid params"}, status=status.HTTP_404_NOT_FOUND
-            )
+        queryset = self.get_queryset()
+        filtered_queryset = self.filter_queryset(queryset)
+        serializer = RecipeDetailsSerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
@@ -133,17 +99,3 @@ class TagViewSet(viewsets.ModelViewSet):
     serializer_class = TagSerializer
     queryset = Tag.objects.all()
     permission_classes = [AllowAny]
-
-
-"""
-possibilité:
-        nom
-        tag_name
-        ingredient_name
-
-        nom, tag_name
-        nom, ingredient_name
-
-        tag_name, ingredient_name
-
-"""
