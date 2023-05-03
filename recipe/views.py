@@ -79,10 +79,33 @@ class RecipeViewSet(viewsets.ModelViewSet):
         :param recipe_name: recipe name
         :return: an Http response
         """
-        queryset = self.get_queryset()
-        filtered_queryset = self.filter_queryset(queryset)
-        serializer = RecipeDetailsSerializer(filtered_queryset, many=True)
-        return Response(serializer.data)
+        query_params = self.request.query_params.dict()
+        serializer_search = SearchSerializer(data=query_params)
+        serializer_search.is_valid(raise_exception=True)
+
+        ingredient_name = serializer_search.validated_data.get("ingredient_name")
+        tag_name = serializer_search.validated_data.get("tag_name")
+        name = serializer_search.validated_data.get("name")
+
+        list_queryset = []
+
+        if ingredient_name:
+            list_queryset.append(Q(ingredient__name__icontains=ingredient_name))
+        if name:
+            list_queryset.append(Q(name__icontains=name))
+        if tag_name:
+            list_queryset.append(Q(tag__name__icontains=tag_name))
+
+        if not list_queryset:
+            return Response([])
+        else:
+            queryset = Recipe.objects.filter(*list_queryset)
+            page = self.paginate_queryset(queryset)
+            if page:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
