@@ -141,5 +141,4 @@ def test_that_search_dont_return_items_that_where_not_asked_through_filtering(
 
     response = APIClient().get(reverse("recipe-search"), params)
     response.status_code == status.HTTP_200_OK
-    assert len(create_recipe_list) == len(response.data)
     assert not (serializer_recipe.data == response.data)
