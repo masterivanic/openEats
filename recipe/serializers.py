@@ -12,7 +12,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["username", "email", "password"]
-        # extra_kwargs = {"password": {"write_only": True}}
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -46,8 +45,8 @@ class SearchSerializer(serializers.Serializer):
 class RecipeDetailsSerializer(serializers.ModelSerializer):
     """RecipeDetails seriliazer in json"""
 
-    ingredient = IngredientSerializer(many=True)
-    tag = TagSerializer(many=True)
+    ingredients = IngredientSerializer(many=True)
+    tags = TagSerializer(many=True)
 
     class Meta:
         model = Recipe
@@ -57,8 +56,8 @@ class RecipeDetailsSerializer(serializers.ModelSerializer):
             "preparation_time",
             "cuisson_time",
             "user",
-            "ingredient",
-            "tag",
+            "ingredients",
+            "tags",
         ]
 
     def create(self, validated_data) -> Recipe:
@@ -67,8 +66,8 @@ class RecipeDetailsSerializer(serializers.ModelSerializer):
         return complete object instances based on the validated data
         """
 
-        ingredients_data = validated_data.pop("ingredient")
-        tag_data = validated_data.pop("tag")
+        ingredients_data = validated_data.pop("ingredients")
+        tag_data = validated_data.pop("tags")
 
         recipe = Recipe.objects.create(**validated_data)
         ingredients = [Ingredient(recipe, **data) for data in ingredients_data]

@@ -1,13 +1,12 @@
 import csv
 import os
-from collections import namedtuple
 from typing import Optional
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.core.management.base import CommandParser
 
-from ...models import Tag
+from recipe.models import Tag
 
 
 class Command(BaseCommand):

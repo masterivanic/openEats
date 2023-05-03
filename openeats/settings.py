@@ -127,6 +127,9 @@ import os
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
+# fixtures path
+FIXTURE_DIRS = (os.path.join(BASE_DIR, "openeats/fixtures"),)
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 

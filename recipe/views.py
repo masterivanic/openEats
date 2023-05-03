@@ -1,19 +1,13 @@
-import django_filters.rest_framework
 from django.contrib.auth.models import User
-from django.db.models import Prefetch
 from django.db.models import Q
-from django.db.models import When
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.utils import extend_schema_view
-from drf_spectacular.utils import OpenApiParameter
 from rest_framework import filters
 from rest_framework import mixins
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import action
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .filters import RecipeFilter
@@ -50,7 +44,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
     """define recipe api endpoint"""
 
-    queryset = Recipe.objects.prefetch_related("ingredient", "tag")
+    queryset = Recipe.objects.prefetch_related("ingredients", "tags")
     serializer_class = RecipeSerializer
     filterset_class = RecipeFilter
     filter_backends = [filters.SearchFilter]
@@ -90,14 +84,14 @@ class RecipeViewSet(viewsets.ModelViewSet):
         list_queryset = []
 
         if ingredient_name:
-            list_queryset.append(Q(ingredient__name__icontains=ingredient_name))
+            list_queryset.append(Q(ingredients__name__icontains=ingredient_name))
         if name:
             list_queryset.append(Q(name__icontains=name))
         if tag_name:
-            list_queryset.append(Q(tag__name__icontains=tag_name))
+            list_queryset.append(Q(tags__name__icontains=tag_name))
 
         if not list_queryset:
-            return Response([])
+            return Response([], status=status.HTTP_200_OK)
         else:
             queryset = Recipe.objects.filter(*list_queryset)
             page = self.paginate_queryset(queryset)
@@ -105,7 +99,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 serializer = self.get_serializer(page, many=True)
                 return self.get_paginated_response(serializer.data)
             serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class IngredientViewSet(viewsets.ModelViewSet):
